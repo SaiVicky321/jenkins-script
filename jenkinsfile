@@ -1,0 +1,42 @@
+pipeline {
+  agent any
+  stages {
+    stage('GIT Checkout') {
+      steps {
+        checkout scmGit(branches: [
+          [name: '*/main']
+        ], extensions: [], userRemoteConfigs: [
+          [url: 'https://github.com/SaiVicky321/Demo-react-app.git']
+        ])
+      }
+    }
+
+    stage('listing the directory') {
+      steps {
+        sh 'ls -lrt'
+      }
+    }
+
+    stage('listing the docker images') {
+      steps {
+        sh 'docker images'
+      }
+    }
+
+    stage('Building the docker image') {
+      steps {
+        sh 'docker build -t saivicky321/my-react-app:V${env.BUILD_NUMBER} .'
+
+        sh 'docker images'
+      }
+    }
+
+    stage('Runnung the container') {
+      steps {
+        sh 'docker run -d -p 80:80 saivicky321/my-react-app:V${env.BUILD_NUMBER}'
+
+        sh 'docker ps -a'
+      }
+    }
+  }
+}
